@@ -1,22 +1,23 @@
 @extends('layout')
 @section('content')
-@if($errors->any())
-<div class="alert alert-danger">
-    <ul>
-        @foreach($errors->all() as $error)
+
+    @if($errors->any())
+    <div class="alert alert-danger">
+        <ul>
+            @foreach($errors->all() as $error)
             <li>
                 {{$error}}
             </li>
-        @endforeach
-    </ul>
-</div>
-@endif
+            @endforeach
+        </ul>
+    </div>
+    @endif
 
 <form action="registr" method="post">
     @csrf
-  <div class="form-group">
-    <label for="exampleInputName">Name</label>
-    <input type="text" class="form-control" id="exampleInputName" name="name">
+    <div class="form-group">
+        <label for="exampleInputName">Name</label>
+        <input type="text" class="form-control" id="exampleInputName" name="name">
   </div>
   <div class="form-group">
     <label for="exampleInputEmail1">Email address</label>

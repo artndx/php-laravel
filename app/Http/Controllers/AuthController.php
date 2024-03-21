@@ -21,12 +21,12 @@ class AuthController extends Controller
         // $response = [
         //     'name'=>$request->name,
         //     'email'=>$request->email,
-        //     'password'=>$request->password
+        //     'password'=>$request->password,
         // ];
         User::create([
             'name'=>$request->name,
             'email'=>$request->email,
-            'password'=>Hash::make($request->password)
+            'password'=>Hash::make($request->password),
         ]);
         return redirect('/');
     }

@@ -17,11 +17,7 @@
       <td>{{$article->name}}</td>
       <td>{{$article->shortDesc}}</td>
       <td>{{$article->desc}}</td>
-      <td>
-        <a href="/full-img/{{$article->full_image}}">
-          <img src={{$article->preview_image}} class="img-fluid ${3|rounded-top,rounded-right,rounded-bottom,rounded-left,rounded-circle,|}" alt="">
-        </a>
-      </td>
+      <td><a href="/full-img/{{$article->full_image}}"><img src="{{URL::asset($article->preview_image)}}" width=100 height=100 alt=""></a></td>
     </tr>
     @endforeach
   </tbody>
