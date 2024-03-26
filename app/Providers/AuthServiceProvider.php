@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Auth\Access\Response;
 use App\Models\User;
 use App\Models\Comment;
-
+use App\Models\Article;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -27,7 +27,13 @@ class AuthServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Gate::define('comment', function(User $user, Comment $comment){
-            return ($user->id == $comment->user_id) ? 
+            return ($user->id == $comment->user_id || $user->role == 'moderator') ? 
+            Response::allow() :
+            Response::deny('You are not author of this comment');
+        });
+
+        Gate::define('article', function(User $user, Article $article){
+            return ($user->role == 'moderator') ? 
             Response::allow() :
             Response::deny('You are not author of this comment');
         });

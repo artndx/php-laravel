@@ -5,12 +5,14 @@
         <h5 class="card-title">{{$article->name}}</h5>
         <p class="card-text">{{$article->desc}}</p>
         <div class="btn-toolbar">
+            @can('article', $article)
             <a href="/article/{{$article->id}}/edit" class="btn btn-primary mr-3">Edit article</a>
             <form action="/article/{{$article->id}}" method="post">
                 @method("DELETE")
                 @csrf
                 <button type="submit" class="btn btn-warning">Delete article</button>
             </form>
+            @endcan
         </div>
         
     </div>
@@ -38,8 +40,8 @@
         <p class="card-text">{{$comment->text}}</p>
         @can('comment', $comment)
         <div class="btn-toolbar">
-            <a href="/article/{{$article->id}}/comment/{{$comment->id}}/edit" class="btn btn-primary mr-3">Edit comment</a>
-            <form action="/article/{{$article->id}}/comment/{{$comment->id}}" method="post">
+            <a href="/comment/{{$comment->id}}/edit" class="btn btn-primary mr-3">Edit comment</a>
+            <form action="/comment/{{$comment->id}}" method="post">
                 @method("DELETE")
                 @csrf
                 <button type="submit" class="btn btn-warning">Delete comment</button>

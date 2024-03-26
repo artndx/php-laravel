@@ -85,6 +85,10 @@ class ArticleController extends Controller
     public function destroy(Article $article)
     {
         $article->delete();
+        $comments = Comment::where('article_id', $article->id)->get();
+        foreach($comments as $comment){
+            $comment->delete();
+        }
         return redirect()->route('article.index');
     }
 }

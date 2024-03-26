@@ -18,7 +18,7 @@ use App\Http\Controllers\CommentController;
 */
 
 //Comment
-Route::post('comment', [CommentController::class, 'store']);
+Route::resource('comment', CommentController::class)->middleware('auth:sanctum');
 
 //Article
 Route::resource('article', ArticleController::class)->middleware('auth:sanctum');
