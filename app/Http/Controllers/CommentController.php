@@ -5,6 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\MailNewComment;
+use App\Models\Article;
+
 class CommentController extends Controller
 {
     /**
@@ -33,12 +37,14 @@ class CommentController extends Controller
             'text'=>'required'
         ]);
 
+        $article = Article::findOrFail(request('article_id'));
         $comment = new Comment;
         $comment->title = request('title');
         $comment->text = request('text');
         $comment->user_id = Auth::id();
         $comment->article_id = request('article_id');
-        $comment->save();
+        $res = $comment->save();
+        if($res) Mail::to('moderator@mail.ru')->send(new MailNewComment($article));
         return redirect()->route('article.show', ['article'=>request('article_id')]);
     }
 
