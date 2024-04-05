@@ -29,6 +29,10 @@ class AuthServiceProvider extends ServiceProvider
         // Gate::before(function(User $user){
         //     if ($user->role == 'moderator') return true;
         // });
+        
+        Gate::define('accept', function(User $user){
+            if ($user->role == 'moderator') return true;
+        });
 
         Gate::define('comment', function(User $user, Comment $comment){
             return ($user->id == $comment->user_id || $user->role == 'moderator') ? 
@@ -39,7 +43,7 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('article', function(User $user, Article $article){
             return ($user->role == 'moderator') ? 
             Response::allow() :
-            Response::deny('You are not author of this comment');
+            Response::deny('You are not moderator');
         });
     }
 }

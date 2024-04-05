@@ -20,6 +20,9 @@
     <div class="card mt-2 mb-2">
     <div class="card-header text-center">
     <h4>Comments</h4>
+    @if(session('res'))
+    <div class="alert-success">Comment was created</div>
+    @endif
             <form action="/comment" method="post">
                 @csrf
                 <input type="hidden" name="article_id" value="{{$article->id}}">
@@ -32,6 +35,7 @@
                     <input type="text" class="form-control" id="exampleInputTitle" name="text">
                 </div>
                 <button type="submit" class="btn btn-primary">Create comment</button>
+                
             </form>
     @foreach($comments as $comment)
     <div class="card mt-2" style="width: 67rem;">

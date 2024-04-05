@@ -18,10 +18,10 @@ class MailNewComment extends Mailable
     /**
      * Create a new message instance.
      */
-
-    public function __construct(public Article $article)
+    public $article;
+    public function __construct(Article $article)
     {
-
+        $this->article = $article;
     }
 
     /**
@@ -30,7 +30,7 @@ class MailNewComment extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            from: new Address('moosbeere_O@mail.ru')
+            from: new Address('artur.stepanyan.03@mail.ru')
         );
     }
 
