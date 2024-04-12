@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Mail;
+
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 
-use App\Mail\MailNewComment;
 use App\Models\Article;
+use App\Jobs\VeryLongJob;
 
 class CommentController extends Controller
 {
@@ -22,7 +23,9 @@ class CommentController extends Controller
         $comments = DB::table('comments')
                     ->join('users','users.id','=','comments.user_id')
                     ->join('articles','articles.id','=','comments.article_id')
-                    ->select('comments.*','users.name as user_name','articles.name as article_name')
+                    ->select('comments.id','comments.title','comments.text', 'comments.accept',
+                    'users.name as user_name','articles.name as article_name', 
+                    )
                     ->get();
         return view('comment.index', ['comments'=>$comments]);
     }
@@ -51,8 +54,14 @@ class CommentController extends Controller
         $comment->text = request('text');
         $comment->user_id = Auth::id();
         $comment->article_id = request('article_id');
+        $moderator_id = User::where('role','moderator')->first()->id;
+        if($comment->user_id == $moderator_id){
+            $comment->accept = true;
+        } else {
+            $comment->accept = false;
+        }
         $res = $comment->save();
-        if($res) Mail::to('artur.stepanyan.03@mail.ru')->send(new MailNewComment($article));
+        if($res) VeryLongJob::dispatch($article);
         return redirect()->route('article.show', ['article'=>request('article_id')])->with(['res'=>$res]);
     }
 
@@ -96,5 +105,20 @@ class CommentController extends Controller
         $article_id = $comment->article_id;
         $comment->delete();
         return redirect()->route('article.show', ['article'=>$article_id]);
+    }
+
+    public function accept(Comment $comment)
+    {   
+
+        $comment->accept = true;
+        $comment->save();
+        return redirect()->route('new_comments');
+    }
+
+    public function reject(Comment $comment)
+    {
+        $comment->accept = false;
+        $comment->save();
+        return redirect()->route('new_comments');
     }
 }

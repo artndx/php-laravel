@@ -8,7 +8,7 @@
       <th scope="col">Text</th>
       <th scope="col">Article</th>
       <th scope="col">User</th>
-      <th scope="col">Accept / Reject</th>
+      <th scope="col">Accept / Reject</th>=
     </tr>
   </thead>
   <tbody>
@@ -19,8 +19,13 @@
       <th scope="row">{{$comment->text}}</th>
       <th scope="row">{{$comment->article_name}}</th>
       <th scope="row">{{$comment->user_name}}</th>
-      <th scope="row"><button type="submit" class="btn btn-success">Accept</button></th>
-      <th scope="row"><button type="submit" class="btn btn-danger">Reject</button></th>
+      <td>
+        @if(!$comment->accept)
+          <a href="comments/{{$comment->id}}/accept"><button type="submit" class="btn btn-success">Accept</button></a>
+        @else
+          <a href="comments/{{$comment->id}}/reject"><button type="submit" class="btn btn-danger">Reject</button></a>
+        @endif
+      </td>
     </tr>
     @endforeach
   </tbody>

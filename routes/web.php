@@ -19,7 +19,10 @@ use App\Http\Controllers\CommentController;
 
 //Comment
 Route::resource('comment', CommentController::class)->middleware('auth:sanctum');
-Route::get('comments', [CommentController::class, 'index']);
+Route::get('comments', [CommentController::class, 'index'])->name('new_comments');
+Route::get('comments/{comment}/accept', [CommentController::class, 'accept']);
+Route::get('comments/{comment}/reject', [CommentController::class, 'reject']);
+
 
 //Article
 Route::resource('article', ArticleController::class)->middleware('auth:sanctum');
