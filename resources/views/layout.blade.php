@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en">
   <head>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <title>Title</title>
     <!-- Required meta tags -->
     <meta charset="utf-8">
@@ -66,7 +67,10 @@
     </header>
     <main>
       <div class="container centered mt-3">
-        @yield('content')
+      <div id="app">
+          <App />
+      </div>
+      @yield('content')
       </div>
     </main>
     <footer></footer>
