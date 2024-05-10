@@ -6,6 +6,8 @@ use App\Models\Article;
 use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Auth\Access\Response;
 use App\Events\ArticleEvent;
 
@@ -16,7 +18,11 @@ class ArticleController extends Controller
      */
     public function index()
     {
-        $articles = Article::latest()->paginate(5);
+        $currentPage = request('page') ? request('page') : 1;
+        $articles = Cache::remember('articles'.$currentPage, 3000, function(){
+            return Article::latest()->paginate(5);
+        });
+        
         return view('article.index', ['articles'=>$articles]);
     }
 
@@ -34,6 +40,12 @@ class ArticleController extends Controller
      */
     public function store(Request $request)
     {
+        $caches = DB::table('cache')
+            ->select('key')
+            ->whereRaw('`key` GLOB :param',[':param'=>'articles*[0-9]'])->get();
+        foreach($caches as $cache){
+            Cache::forget($cache->key);
+        }
         $request->validate([
             'date'=>'required',
             'name'=>'required|min:6',
@@ -53,7 +65,10 @@ class ArticleController extends Controller
      * Display the specified resource.
      */
     public function show(Article $article)
-    {
+    {   
+        if(isset($_GET['id_notify'])){
+            auth()->user()->notifications()->where('id', $_GET['id_notify'])->first()->markAsRead();
+        }
         $comments = Comment::where(
             [
                 'article_id'=>$article->id, 
@@ -76,6 +91,12 @@ class ArticleController extends Controller
      */
     public function update(Request $request, Article $article)
     {
+        $caches = DB::table('cache')
+            ->select('key')
+            ->whereRaw('`key` GLOB :param',[':param'=>'articles*[0-9]'])->get();
+        foreach($caches as $cache){
+            Cache::forget($cache->key);
+        }
         $request->validate([
             'date'=>'required',
             'name'=>'required|min:6',
@@ -94,6 +115,12 @@ class ArticleController extends Controller
      */
     public function destroy(Article $article)
     {
+        $caches = DB::table('cache')
+            ->select('key')
+            ->whereRaw('`key` GLOB :param',[':param'=>'articles*[0-9]'])->get();
+        foreach($caches as $cache){
+            Cache::forget($cache->key);
+        }
         Gate::authorize('delete', [self::class, $article]);
         $article->delete();
         $comments = Comment::where('article_id', $article->id)->get();

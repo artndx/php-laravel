@@ -41,17 +41,25 @@
       <li class="nav-item">
         <a class="nav-link" href="/contacts">Contacts<span class="sr-only">(current)</span></a>
       </li>
+      @auth
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">
-          Dropdown
+          Notify <span>{{auth()->user()->unreadNotifications()->count()}}</span>
         </a>
         <div class="dropdown-menu">
-          <a class="dropdown-item" href="#">Action</a>
-          <a class="dropdown-item" href="#">Another action</a>
-          <div class="dropdown-divider"></div>
-          <a class="dropdown-item" href="#">Something else here</a>
+          @foreach(auth()->user()->unreadNotifications as $notify)
+            <a class="dropdown-item" href="{{route(
+                                              'article.show', 
+                                              [
+                                                'article'=>$notify->data['id_article'],
+                                                'id_notify'=> $notify->id
+                                              ],
+                                              )
+                                            }}">{{$notify->data['title']}}</a>
+          @endforeach
         </div>
       </li>
+      @endauth
     </ul>
     <div class="form-inline my-2 my-lg-0">
       @guest
@@ -59,6 +67,7 @@
        <a href="/login" class="btn btn-outline-success mr-2 my-2 my-sm-0">Sign Up</a>
        @endguest
        @auth
+       <a class="navbar-brand">Name : {{auth()->user()->name}} </a>
        <a href="/logout" class="btn btn-outline-success mr-2 my-2 my-sm-0">Log Out</a>
        @endauth
     </div>

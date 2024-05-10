@@ -9,9 +9,12 @@ use Illuminate\Support\Facades\Auth;
 
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 
 use App\Models\Article;
 use App\Jobs\VeryLongJob;
+
+use App\Notifications\CommentNotify;
 
 class CommentController extends Controller
 {
@@ -109,9 +112,12 @@ class CommentController extends Controller
 
     public function accept(Comment $comment)
     {   
-
         $comment->accept = true;
-        $comment->save();
+        $res = $comment->save();
+        if($res){
+            $users = User::where('id', '!=', $comment->user_id)->get();
+            Notification::send($users, new CommentNotify($comment->title, $comment->article_id));
+        }
         return redirect()->route('new_comments');
     }
 
