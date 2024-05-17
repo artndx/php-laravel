@@ -8,7 +8,7 @@
       <th scope="col">Text</th>
       <th scope="col">Article</th>
       <th scope="col">User</th>
-      <th scope="col">Accept / Reject</th>=
+      <th scope="col">Accept / Reject</th>
     </tr>
   </thead>
   <tbody>

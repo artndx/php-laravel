@@ -46,6 +46,7 @@ class ArticleController extends Controller
         foreach($caches as $cache){
             Cache::forget($cache->key);
         }
+
         $request->validate([
             'date'=>'required',
             'name'=>'required|min:6',
@@ -69,11 +70,10 @@ class ArticleController extends Controller
         if(isset($_GET['id_notify'])){
             auth()->user()->notifications()->where('id', $_GET['id_notify'])->first()->markAsRead();
         }
-        $comments = Comment::where(
-            [
-                'article_id'=>$article->id, 
-                'accept'=>true
-            ])->get();
+        $comments = Cache::rememberForever('comments_'.$article->id, function()use($article){
+            return Comment::where('article_id', $article->id)->where('accept', 1)->get();
+        });
+
         return view('article.show', ['article'=>$article, 'comments'=>$comments]);
     }
 
@@ -97,6 +97,7 @@ class ArticleController extends Controller
         foreach($caches as $cache){
             Cache::forget($cache->key);
         }
+
         $request->validate([
             'date'=>'required',
             'name'=>'required|min:6',
@@ -115,12 +116,7 @@ class ArticleController extends Controller
      */
     public function destroy(Article $article)
     {
-        $caches = DB::table('cache')
-            ->select('key')
-            ->whereRaw('`key` GLOB :param',[':param'=>'articles*[0-9]'])->get();
-        foreach($caches as $cache){
-            Cache::forget($cache->key);
-        }
+        Cache::flush();
         Gate::authorize('delete', [self::class, $article]);
         $article->delete();
         $comments = Comment::where('article_id', $article->id)->get();
