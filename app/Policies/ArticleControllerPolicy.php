@@ -37,9 +37,11 @@ class ArticleControllerPolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Article $article): bool
+    public function update(User $user, Article $article)
     {
-        return $user->role == 'moderator';
+        return ($user->role == 'moderator') ? 
+            Response::allow() :
+            Response::deny('You aren`t moderator!');
     }
 
     /**

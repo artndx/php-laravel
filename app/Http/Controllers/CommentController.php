@@ -73,6 +73,7 @@ class CommentController extends Controller
         if($res) {
             VeryLongJob::dispatch($article);
         }
+        if($request->expectsJson()) return response()->json($comment);
         return redirect()->route('article.show', ['article'=>request('article_id')])->with(['res'=>$res]);
     }
 

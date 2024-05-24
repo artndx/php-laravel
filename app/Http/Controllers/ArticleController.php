@@ -22,7 +22,7 @@ class ArticleController extends Controller
         $articles = Cache::remember('articles'.$currentPage, 3000, function(){
             return Article::latest()->paginate(5);
         });
-        
+        if(request()->expectsJson()) return response()->json($articles);
         return view('article.index', ['articles'=>$articles]);
     }
 
@@ -59,6 +59,7 @@ class ArticleController extends Controller
         $article->user_id = 1;
         $res = $article->save();
         if($res) ArticleEvent::dispatch($article);
+        if($request->expectsJson()) return response()->json($res);
         return redirect()->route('article.index');
     }
 
@@ -73,6 +74,7 @@ class ArticleController extends Controller
         $comments = Cache::rememberForever('comments_'.$article->id, function()use($article){
             return Comment::where('article_id', $article->id)->where('accept', 1)->get();
         });
+        if(request()->expectsJson()) return response()->json(['article'=>$article, 'comments'=>$comments]);
 
         return view('article.show', ['article'=>$article, 'comments'=>$comments]);
     }
@@ -82,7 +84,7 @@ class ArticleController extends Controller
      */
     public function edit(Article $article)
     {
-        $this->authorize('update', $article);
+        $this->authorize('update', [self::class, $article]);
         return view('article.edit', ['article'=>$article]);
     }
 
@@ -107,8 +109,9 @@ class ArticleController extends Controller
         $article->name = request('name');
         $article->desc = request('desc');
         $article->user_id = 1;
-        $article->save();
+        $res = $article->save();
         return redirect()->route('article.show', ['article'=>$article->id]);
+        if($request->expectsJson()) return response()->json($res);
     }
 
     /**
@@ -118,11 +121,12 @@ class ArticleController extends Controller
     {
         Cache::flush();
         Gate::authorize('delete', [self::class, $article]);
-        $article->delete();
+        $res = $article->delete();
         $comments = Comment::where('article_id', $article->id)->get();
         foreach($comments as $comment){
             $comment->delete();
         }
         return redirect()->route('article.index');
+        if($request->expectsJson()) return response()->json($res);
     }
 }
